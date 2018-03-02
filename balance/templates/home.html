@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+
+
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Badminton Balances</title>
+</head>
+<body>
+<div>
+<H1 ALIGN="center">Badminton Balance</H1>
+</div>
+<!--
+<H2 ALIGN="left">Balances</H2>
+<span id='allObjects_result0'></span>
+-->
+<div>
+<H2 ALIGN="left">Balances</H2>
+<table id='allObjects_result1' border="1"></table>
+</div>
+
+<div>
+<H2 ALIGN="left">Activity</H2>
+<form name="form_activity" method="post" action="/activity/" onSubmit="return activityCheck()">{% csrf_token %}
+    <table border="0">
+        <tbody>
+
+            <tr>
+                <td>Date:</td>
+                <td><input type="date" name="date"></td>
+            </tr>
+            <tr>
+                <td>Total Cost(SEK):</td>
+                <td><input type="number" name="cost" min="0" max="100000" default="0" step="0.01"></td>
+            </tr>
+            <tr>
+                <td style="vertical-align:top">People:</td>
+                <td>
+                    <span id='allObjects_result3'></span>
+                </td>
+            </tr>
+            <tr>
+                <td style="vertical-align:top">Note:</td>
+                <td><textarea name="note" style="width:200px;height:100px" rows="5"></textarea></td>
+            </tr>
+            <tr>
+                <td>
+                    <input type="submit" value="Submit" />  
+                    <input type="reset" value="Reset"/>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</form>
+</div>
+
+<div>
+<H2 ALIGN="left">To Charge</H2>
+<form name="form_charge" method="post" action="/charge/" onSubmit="return chargeInformCheck()">{% csrf_token %}
+    <table border="0">
+        <tbody>
+            <tr>
+                <td>Money(SEK):</td>
+                <td><input type="number" name="money" min="0" max="100000" default="0"></td>
+            </tr>
+            <tr>
+                <td>User:</td>
+                <td>
+                    <select name="user" id="allObjects_result2">
+                        <option value="">--Select--</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <input type="submit" value="Submit" />  
+                    <input type="reset" value="Reset"/>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</form>
+</div>
+
+<div>
+<H2 ALIGN="left">Add User</H2>
+<form name="form_addUser" method="post" action="/addUser/" onSubmit="return userFieldCheck()">{% csrf_token %}
+    <table border="0">
+        <tbody>
+            <tr>
+                <td>Name:</td>
+                <td><input type="text" name="name" /></td>
+            </tr>
+
+            <tr>
+                <td>Gender:</td>
+                <td>
+                    <select name="gender">
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>Email:</td>
+                <td><input type="email" name="email" /></td>
+            </tr>
+            <tr>
+                <td>
+                    <input type="submit" value="Submit" />  
+                    <input type="reset" value="Reset"/>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</form>
+</div>
+
+<script src="http://apps.bdimg.com/libs/jquery/1.11.1/jquery.min.js"></script>
+
+<script language="javascript">
+
+    function userFieldCheck() {
+        if (document.form_addUser.name.value === "") {
+            window.alert("The name is empty!");
+            return false;
+        }
+        if (document.form_addUser.email.value === "") {
+            window.alert("The email is empty!");
+            return false;
+        }
+        return true;
+    }
+
+    function chargeInformCheck() {
+        if ((document.form_charge.money.value === "")||(document.form_charge.money.value === 0)) {
+            window.alert("The money can't be zero or empty!");
+            return false;
+        }
+        if (document.form_charge.user.value === "") {
+            window.alert("Please select a user!");
+            return false;
+        }
+        return true;
+    }
+    function activityCheck(){
+        if (document.form_activity.date.value === "") {
+            window.alert("Please input the date!");
+            return false;
+        }
+
+        if ((document.form_activity.cost.value === "")||(document.form_activity.cost.value === 0)) {
+            window.alert("The cost can't be zero or empty!");
+            return false;
+        }
+        var people = document.forms['form_activity'].elements['people[]'];
+        for (var i=0; i<people.length; i++) {
+            if (people[i].checked === true)
+            return ture ;
+            }
+        window.alert("Please select at least one person!");
+        return false;
+    }
+
+
+
+    $(document).ready(function(){
+        $('#allObjects').ready(function(){
+          $.getJSON("{% url 'ajax-allObjects' %}",function(ret){
+            $.each(ret, function(key,value){
+                $('#allObjects_result0').append(value.Name +': ' + value.Balance +'<br>');
+            });
+            $.each(ret, function(key,value){
+                $('#allObjects_result1').append('<tr><td>'+value.Name +'</td><td align="right">' + value.Balance +'</td></tr>');
+            });
+            $.each(ret, function(key,value){
+                $('#allObjects_result2').append('<option value=\"' + value.Name + '\">' + value.Name + '</option>');
+            });
+            $.each(ret, function(key,value){
+                $('#allObjects_result3').append('<input type="checkbox" name="people[]" value=\"' + value.Name + '\">' + value.Name + '</input>'+'<br>');
+            });
+
+
+
+          })
+        })
+      });
+
+
+
+
+
+
+</script> 
+
+</body>
+</html>
